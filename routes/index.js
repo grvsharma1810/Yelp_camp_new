@@ -1,72 +1,57 @@
-const express    = require("express"),
-      router     = express.Router(),
-      passport   = require("passport"),
-      User       = require("../models/user");
+var express = require("express");
+var router = express.Router();
+var passport = require("passport");
+var User  = require("../models/user");
 
-// root route
-router.get('/', (req, res) => res.render('landing'));
+// default route
+router.get("/", function (req, res) {
+    res.render("landing");
+});
 
 // show register form
-router.get("/register", (req, res) => res.render("register", {page: "register"}));
+router.get("/register", function(req, res) {
+    res.render("register");
+});
 
 // handle sign up logic
-router.post("/register", (req, res) => {
-  let newUser = new User({
-    username: req.body.username,
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    avatar: req.body.avatar
-  });
-  
-  if (req.body.adminCode === process.env.ADMINCODE) {
-    newUser.isAdmin = true;
-  }
-  User.register(newUser, req.body.password, (err, user) => {
-    if (err) {
-      if (err.name === 'MongoError' && err.code === 11000) {
-        // Duplicate email
-        req.flash("error", "That email has already been registered.");
-        return res.redirect("/register");
-      } 
-      // Some other error
-      req.flash("error", "Something went wrong...");
-      return res.redirect("/register");
-    }
-    
-    passport.authenticate("local")(req, res, () => {
-      req.flash("success", "Welcome to YelpCamp " + user.username);
-      res.redirect("/campgrounds");
+router.post("/register", function(req, res) {
+router// register an user from given request body
+    var newUser = new User({username: req.body.username});
+    User.register(newUser, req.body.password, function (err, user) {
+        // callback details
+        if (err) {
+            // display flash error message from the database
+           req.flash("error", err.message);
+           return res.render("register");
+       }
+        // authenticate the given user
+        passport.authenticate("local")(req, res, function () {
+            // display the welcome flash notification and redirect
+            req.flash("success", "Welcome to YelpCamp " + user.username);
+            res.redirect("/campgrounds");
+        });
     });
-  });
 });
 
 // show login form
-router.get("/login", (req, res) => res.render("login", {page: "login"}));
-
-// login logic: app.post("/login", middleware, callback)
-router.post("/login", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) { return next(err); }
-    if (!user) {
-      req.flash("error", "Invalid username or password");
-      return res.redirect('/login');
-    }
-    req.logIn(user, err => {
-      if (err) { return next(err); }
-      let redirectTo = req.session.redirectTo ? req.session.redirectTo : '/campgrounds';
-      delete req.session.redirectTo;
-      req.flash("success", "Good to see you again, " + user.username);
-      res.redirect(redirectTo);
-    });
-  })(req, res, next);
+router.get("/login", function(req, res) {
+    res.render("login");
 });
 
-// logout route
-router.get("/logout", (req, res) => {
-  req.logout();
-  req.flash("success", "Logged out seccessfully. Look forward to seeing you again!");
-  res.redirect("/campgrounds");
+// handling login logic with passport middleware
+router.post("/login", passport.authenticate("local",  
+    {
+        successRedirect: "/campgrounds",
+        failureRedirect: "login"
+    }), function(req, res) {
 });
 
+// log out route
+router.get("/logout", function(req, res) {
+   req.logout();
+   req.flash("success", "Logged you out!"); // handle logout flash msg
+   res.redirect("/campgrounds");
+});
+
+// export the router module
 module.exports = router;

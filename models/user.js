@@ -1,18 +1,14 @@
-const mongoose              = require("mongoose"),
-      passportLocalMongoose = require("passport-local-mongoose");
-      
-const UserSchema = new mongoose.Schema({
-  username: { type: String, unique: true, required: true },
-  password: String,
-  avatar: String,
-  firstName: String,
-  lastName: String,
-  email: { type: String, unique: true, required: true },
-  resetPasswordToken: String,
-  resetPasswordExpires: Date,
-  isAdmin: { type: Boolean, default: false }
+// import package
+var mongoose = require("mongoose");
+var passportLocalMongoose = require("passport-local-mongoose");
+
+// create a User schema
+var UserSchema = new mongoose.Schema({
+   username: String,
+   password: String
 });
 
-UserSchema.plugin(passportLocalMongoose);
+UserSchema.plugin(passportLocalMongoose); // adding method to user
 
+// export the model
 module.exports = mongoose.model("User", UserSchema);
