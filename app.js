@@ -32,7 +32,7 @@ app.locals.moment = moment; // create local variable available for the applicati
 
 //passport configuration
 app.use(session({
-  secret: process.env.SESSIONSECRET,
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: false
 }));
@@ -58,4 +58,4 @@ app.use("/campgrounds/:id/comments", commentRoute);
 app.use("/users", userRoute);
 app.use("/", passwordRoute);
 
-app.listen(process.env.PORT, process.env.IP, () => console.log("The YelpCamp Server Has Started!"));
+app.listen(process.env.PORT || 8000, () => console.log("The YelpCamp Server Has Started!"));
