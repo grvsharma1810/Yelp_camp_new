@@ -17,6 +17,7 @@ var commentRoutes    = require("./routes/comments"),
     campgroundRoutes = require("./routes/campgrounds"),
     indexRoutes      = require('./routes/index');
     
+
 // set up the mongodb
 let url = process.env.MONGOLAB_URI || "mongodb://localhost/yelp_camp_v13"; // fallback in case global var not working
 //let url = "mongodb+srv://gaurav:sabkakatega123@@cluster0-jszq1.mongodb.net/test?retryWrites=true&w=majority" || "mong/odb://localhost/yelp_camp_v13"
