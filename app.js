@@ -18,8 +18,8 @@ var commentRoutes    = require("./routes/comments"),
     indexRoutes      = require('./routes/index');
     
 // set up the mongodb
-var url =process.env.DATABASEURL || "mongodb://localhost:/10";
-mongoose.connect(url);
+let url = process.env.DATABASEURL || "mongodb://localhost/yelp_camp_v13"; // fallback in case global var not working
+mongoose.connect(url, {useMongoClient: true});
 
 // set up body-parser
 app.use(bodyParser.urlencoded({extended: true}));
